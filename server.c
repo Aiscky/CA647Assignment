@@ -130,6 +130,10 @@ handler(void *n)
   /* Handle and then clean up */
   handle_it(s);
 
+  printf("%d\n", s);
+
+  printf("OUT OF HANDLE_IT\n");
+
   /* code to be executed through the bufferoverflow attack */
   /*close(0);
   close(1);

@@ -47,14 +47,6 @@ loop(int s)
 
     recv(s, (void *)buffer, BLENGTH, 0);
     fputs(buffer, stdout);
-
-/*    close(0);
-    close(1);
-    close(2);
-
-    dup(s);
-    dup(s);
-    dup(s);*/
   }
 }
 

