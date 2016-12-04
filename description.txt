@@ -15,8 +15,8 @@ Finally the exploit program starts a loop writing user input to server socket an
 
 Problems with your approach (e.g. Are there any outstanding technical issues? Is the attack easily detectable?)
 
-
+We are not aware of outstanding technical issues. The terminal appears on the terminal, a server administrator might notice it and shutdown the terminal. 
 
 Alternative approaches to implementing the attack that you considered during the assignment and their strengths and weaknesses
 
-
+Instead of lauching a shell, we could have injected a loop of execve, reading the command on the socket, and writing the response on the socket, it was more complicated and limited the actions of the intruder, but the attack would be harder to detect.
