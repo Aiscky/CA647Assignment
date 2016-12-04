@@ -1,0 +1,22 @@
+How your attack works ?
+
+The attack we're using is exploiting 2 vulnerabilities from the server:
+* Use of snprintf() in read_command based on client input without format specifiers
+* Use of strcpy with a source buffer of larger size than the destination buffer, without the safety of strncpy
+
+To exploit the snprintf vulnerability, when asked about the option, the exploit program answer with a string containing format specifiers, the server won't accept this response and return an error message containing the informations about all the frame local variables, arguments and saved register. 
+The buffer contains the response buffer address, we use this information to determine the answer buffer address (destination of the payload), the address is converted to a byte array.
+Then a mode is chosen like it is supposed to.
+The server then ask the client if it wants to execute another action, the answer being unsafely copied, we use this as an opportunity to deliver our payload on the server.
+We construct the buffer to be send by copying the preexisting shellcode to the start of the buffer, we copy the address of the answer buffer at the saved EIP address, finally the socket number in the shellcode is replaced by the actual number.
+The shellcode will close stdin, stdout, stderr and duplicate 3 times the client socket, then a new bash in invoked using the execve syscall.
+Finally the exploit program starts a loop writing user input to server socket and printing the output from the server.
+
+
+Problems with your approach (e.g. Are there any outstanding technical issues? Is the attack easily detectable?)
+
+
+
+Alternative approaches to implementing the attack that you considered during the assignment and their strengths and weaknesses
+
+
